@@ -5,7 +5,9 @@
 #include "game.h"
 #include "resource_manager.h"
 #include "sprite_renderer.h"
+#include "game_object.h"
 #include "ball_object.h"
+#include "particle_generator.h"
 
 // Game-related State data
 SpriteRenderer *Renderer;
@@ -13,6 +15,8 @@ SpriteRenderer *Renderer;
 GameObject *Player;
 
 BallObject *Ball;
+
+ParticleGenerator *Particles;
 
 Game::Game(GLuint width, GLuint height)
         : State(GAME_ACTIVE), Keys(), Width(width), Height(height) {
@@ -23,24 +27,32 @@ Game::~Game() {
     delete Renderer;
     delete Player;
     delete Ball;
+    delete Particles;
 }
 
 void Game::Init() {
     // Load shaders
     ResourceManager::LoadShader("../src/shaders/sprite_v.glsl", "../src/shaders/sprite_f.glsl", nullptr, "sprite");
+    ResourceManager::LoadShader("../src/shaders/particle_v.glsl", "../src/shaders/particle_f.glsl", nullptr,
+                                "particle");
     // Configure shaders
     glm::mat4 projection = glm::ortho(0.0f, static_cast<GLfloat>(this->Width), static_cast<GLfloat>(this->Height), 0.0f,
                                       -1.0f, 1.0f);
     ResourceManager::GetShader("sprite").Use().SetInteger("image", 0);
     ResourceManager::GetShader("sprite").SetMatrix4f("projection", projection);
-    // Set render-specific controls
-    Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
+    ResourceManager::GetShader("particle").Use().SetInteger("sprite", 0);
+    ResourceManager::GetShader("particle").SetMatrix4f("projection", projection);
     // 加载纹理
     ResourceManager::LoadTexture("../res/textures/background.jpg", GL_FALSE, "background");
     ResourceManager::LoadTexture("../res/textures/awesomeface.png", GL_TRUE, "face");
     ResourceManager::LoadTexture("../res/textures/block.png", GL_FALSE, "block");
     ResourceManager::LoadTexture("../res/textures/block_solid.png", GL_FALSE, "block_solid");
-    ResourceManager::LoadTexture("../res/textures/paddle.png", true, "paddle");
+    ResourceManager::LoadTexture("../res/textures/paddle.png", GL_TRUE, "paddle");
+    ResourceManager::LoadTexture("../res/textures/particle.png", GL_TRUE, "particle");
+    // Set render-specific controls
+    Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
+    Particles = new ParticleGenerator(ResourceManager::GetShader("particle"), ResourceManager::GetTexture("particle"),
+                                      1000);
     // 加载关卡
     GameLevel one;
     one.Load("../res/levels/1.lvl", this->Width, this->Height * 0.5);
@@ -71,6 +83,8 @@ void Game::Update(GLfloat dt) {
     Ball->Move(dt, this->Width);
     // 检测碰撞
     this->DoCollisions();
+    // 更新粒子
+    Particles->Update(dt, *Ball, 2, glm::vec2(Ball->Radius / 2));
     // 检测失败
     if (Ball->Position.y >= this->Height) { // 球是否接触底部边界？
         this->ResetLevel();
@@ -116,6 +130,8 @@ void Game::Render() {
         this->Levels[this->Level].Draw(*Renderer);
         // 绘制挡板
         Player->Draw(*Renderer);
+        // 绘制粒子
+        Particles->Draw();
         // 绘制球
         Ball->Draw(*Renderer);
     }
