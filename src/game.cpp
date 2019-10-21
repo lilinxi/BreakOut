@@ -5,11 +5,14 @@
 #include "game.h"
 #include "resource_manager.h"
 #include "sprite_renderer.h"
+#include "ball_object.h"
 
 // Game-related State data
 SpriteRenderer *Renderer;
 
 GameObject *Player;
+
+BallObject *Ball;
 
 Game::Game(GLuint width, GLuint height)
         : State(GAME_ACTIVE), Keys(), Width(width), Height(height) {
@@ -19,6 +22,7 @@ Game::Game(GLuint width, GLuint height)
 Game::~Game() {
     delete Renderer;
     delete Player;
+    delete Ball;
 }
 
 void Game::Init() {
@@ -57,10 +61,13 @@ void Game::Init() {
             this->Height - PLAYER_SIZE.y
     );
     Player = new GameObject(playerPos, PLAYER_SIZE, ResourceManager::GetTexture("paddle"));
+    glm::vec2 ballPos = playerPos + glm::vec2(PLAYER_SIZE.x / 2 - BALL_RADIUS, -BALL_RADIUS * 2);
+    Ball = new BallObject(ballPos, BALL_RADIUS, INITIAL_BALL_VELOCITY,
+                          ResourceManager::GetTexture("face"));
 }
 
 void Game::Update(GLfloat dt) {
-
+    Ball->Move(dt, this->Width);
 }
 
 void Game::ProcessInput(GLfloat dt) {
@@ -78,6 +85,10 @@ void Game::ProcessInput(GLfloat dt) {
                 Player->Position.x += velocity;
             }
         }
+        // 释放球
+        if (this->Keys[GLFW_KEY_SPACE]) {
+            Ball->Stuck = false;
+        }
     }
 }
 
@@ -91,5 +102,7 @@ void Game::Render() {
         this->Levels[this->Level].Draw(*Renderer);
         // 绘制挡板
         Player->Draw(*Renderer);
+        // 绘制球
+        Ball->Draw(*Renderer);
     }
 }
