@@ -19,5 +19,5 @@ link_libraries(${OPENGL} ${GLFW_LINK} ${ASSIMP_LINK} ${FREETYPE_LINK})
 set(SOURCE_FILES src/glad.c main.cpp)
 add_executable(BreakOut main.cpp)
 if (APPLE)
-    target_link_libraries(BreakOut "-framework OpenGL") # 直接渲染模式
+    target_link_libraries(BreakOut "-framework OpenGL")
 endif ()
