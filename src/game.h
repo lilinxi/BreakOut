@@ -11,6 +11,7 @@
 #include "game_level.h"
 
 #include <vector>
+#include <tuple>
 
 // Represents the current state of the game
 enum GameState {
@@ -19,9 +20,20 @@ enum GameState {
     GAME_WIN
 };
 
+// Represents the four possible (collision) directions
+enum Direction {
+    UP,
+    RIGHT,
+    DOWN,
+    LEFT
+};
+
+// Defines a Collision typedef that represents collision data
+typedef std::tuple<GLboolean, Direction, glm::vec2> Collision; // <collision?, what direction?, difference vector center - closest point>
+
 // 初始化挡板的大小
 const glm::vec2 PLAYER_SIZE(100, 20);
-// 初始化当班的速率
+// 初始化挡板的速率
 const GLfloat PLAYER_VELOCITY(500.0f);
 
 // 初始化球的速度
@@ -58,6 +70,11 @@ public:
     void Render();
 
     void DoCollisions();
+
+    // Reset
+    void ResetLevel();
+
+    void ResetPlayer();
 };
 
 #endif
