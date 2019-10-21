@@ -8,6 +8,8 @@
 #include <sstream>
 #include <fstream>
 
+#define STB_IMAGE_IMPLEMENTATION
+
 #include <stb_image.h>
 
 // Instantiate static variables
@@ -36,12 +38,12 @@ Texture2D ResourceManager::GetTexture(std::string name) {
 
 void ResourceManager::Clear() {
     // (Properly) delete all shaders
-    for (const auto& iter : Shaders) {
+    for (const auto &iter : Shaders) {
         glDeleteProgram(iter.second.ID);
     }
     Shaders.clear();
     // (Properly) delete all textures
-    for (const auto& iter : Textures) {
+    for (const auto &iter : Textures) {
         glDeleteTextures(1, &iter.second.ID);
     }
     Textures.clear();
