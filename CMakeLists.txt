@@ -9,15 +9,16 @@ set(GLM_H /usr/local/Cellar/glm/0.9.9.5/include/glm)                    # brew i
 set(STB_H /usr/local/include/stb)                                       # https://github.com/nothings/stb
 set(ASSIMP_H /usr/local/Cellar/assimp/4.1.0/include/assimp)             # brew install assimp
 set(FREETYPE_H /usr/local/Cellar/freetype/2.10.1/include/freetype2)     # brew install freetype
-include_directories(${GLFW_H} ${GLAD_H} ${GLM_H} ${STB_H} ${ASSIMP_H} ${FREETYPE_H})
+set(SRC_H src)
+include_directories(${GLFW_H} ${GLAD_H} ${GLM_H} ${STB_H} ${ASSIMP_H} ${FREETYPE_H} ${SRC_H})
 
 set(GLFW_LINK /usr/local/Cellar/glfw/3.3/lib/libglfw.3.dylib)
 set(ASSIMP_LINK /usr/local/Cellar/assimp/4.1.0/lib/libassimp.4.1.0.dylib)
 set(FREETYPE_LINK /usr/local/Cellar/freetype/2.10.1/lib/libfreetype.dylib)
 link_libraries(${OPENGL} ${GLFW_LINK} ${ASSIMP_LINK} ${FREETYPE_LINK})
 
-set(SOURCE_FILES src/glad.c main.cpp)
-add_executable(BreakOut main.cpp)
+set(SOURCE_FILES src/glad.c main.cpp src/game.cpp src/game.h src/shader.cpp src/shader.h src/texture2d.cpp src/texture2d.h src/resource_manager.cpp src/resource_manager.h)
+add_executable(BreakOut ${SOURCE_FILES})
 if (APPLE)
     target_link_libraries(BreakOut "-framework OpenGL")
 endif ()
