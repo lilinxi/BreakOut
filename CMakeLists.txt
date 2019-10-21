@@ -17,7 +17,7 @@ set(ASSIMP_LINK /usr/local/Cellar/assimp/4.1.0/lib/libassimp.4.1.0.dylib)
 set(FREETYPE_LINK /usr/local/Cellar/freetype/2.10.1/lib/libfreetype.dylib)
 link_libraries(${OPENGL} ${GLFW_LINK} ${ASSIMP_LINK} ${FREETYPE_LINK})
 
-set(SOURCE_FILES src/glad.c main.cpp src/game.cpp src/game.h src/shader.cpp src/shader.h src/texture2d.cpp src/texture2d.h src/resource_manager.cpp src/resource_manager.h)
+set(SOURCE_FILES src/glad.c main.cpp src/game.cpp src/game.h src/shader.cpp src/shader.h src/texture2d.cpp src/texture2d.h src/resource_manager.cpp src/resource_manager.h src/sprite_renderer.cpp src/sprite_renderer.h)
 add_executable(BreakOut ${SOURCE_FILES})
 if (APPLE)
     target_link_libraries(BreakOut "-framework OpenGL")
