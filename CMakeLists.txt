@@ -20,5 +20,5 @@ link_libraries(${OPENGL} ${GLFW_LINK} ${ASSIMP_LINK} ${FREETYPE_LINK})
 set(SOURCE_FILES src/glad.c main.cpp src/game.cpp src/game.h src/shader.cpp src/shader.h src/texture2d.cpp src/texture2d.h src/resource_manager.cpp src/resource_manager.h)
 add_executable(BreakOut ${SOURCE_FILES})
 if (APPLE)
-    target_link_libraries(BreakOut "-framework OpenGL") # 直接渲染模式
+    target_link_libraries(BreakOut "-framework OpenGL")
 endif ()
