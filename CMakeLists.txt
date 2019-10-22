@@ -11,7 +11,7 @@ set(ASSIMP_H /usr/local/Cellar/assimp/4.1.0/include/assimp)             # brew i
 set(FREETYPE_H /usr/local/Cellar/freetype/2.10.1/include/freetype2)     # brew install freetype
 set(IRRKlANG_H /usr/local/Cellar/irrKlang/include)                      # https://www.ambiera.com/irrklang/downloads.html mp3 to wav : https://convertio.co/zh/mp3-wav/
 set(SRC_H src)
-include_directories(${GLFW_H} ${GLAD_H} ${GLM_H} ${STB_H} ${ASSIMP_H} ${FREETYPE_H} ${IRRKlANG_H} ${IRRKlANG_MP3_H} ${SRC_H})
+include_directories(${GLFW_H} ${GLAD_H} ${GLM_H} ${STB_H} ${ASSIMP_H} ${FREETYPE_H} ${IRRKlANG_H} ${SRC_H})
 
 set(GLFW_LINK /usr/local/Cellar/glfw/3.3/lib/libglfw.3.dylib)
 set(ASSIMP_LINK /usr/local/Cellar/assimp/4.1.0/lib/libassimp.4.1.0.dylib)
