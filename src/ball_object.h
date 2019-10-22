@@ -21,6 +21,7 @@ public:
     // Ball state
     GLfloat Radius;
     GLboolean Stuck;
+    GLboolean Sticky, PassThrough;
 
     // Constructor(s)
     BallObject();

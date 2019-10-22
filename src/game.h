@@ -9,6 +9,7 @@
 #include <glfw3.h>
 
 #include "game_level.h"
+#include "power_up.h"
 
 #include <vector>
 #include <tuple>
@@ -54,6 +55,8 @@ public:
     std::vector<GameLevel> Levels;
     GLuint Level;
 
+    std::vector<PowerUp> PowerUps;
+
     // Constructor/Destructor
     Game(GLuint width, GLuint height);
 
@@ -75,6 +78,11 @@ public:
     void ResetLevel();
 
     void ResetPlayer();
+
+    // Powerups
+    void SpawnPowerUps(GameObject &block);
+
+    void UpdatePowerUps(GLfloat dt);
 };
 
 #endif
