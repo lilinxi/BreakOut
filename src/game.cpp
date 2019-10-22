@@ -61,7 +61,7 @@ void Game::Init() {
     Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
     Particles = new ParticleGenerator(ResourceManager::GetShader("particle"), ResourceManager::GetTexture("particle"),
                                       1000);
-    Effects = new PostProcessor(ResourceManager::GetShader("postprocessing"), this->Width, this->Height);
+    Effects = new PostProcessor(ResourceManager::GetShader("postprocessing"), this->Width * 2, this->Height * 2);
     // 加载关卡
     GameLevel one;
     one.Load("../res/levels/1.lvl", this->Width, this->Height * 0.5);
@@ -142,7 +142,7 @@ void Game::ProcessInput(GLfloat dt) {
 
 void Game::Render() {
     if (this->State == GAME_ACTIVE) {
-//        Effects->BeginRender();
+        Effects->BeginRender();
         // 绘制背景
         Renderer->DrawSprite(ResourceManager::GetTexture("background"),
                              glm::vec2(0, 0), glm::vec2(this->Width, this->Height), 0.0f
@@ -155,8 +155,8 @@ void Game::Render() {
         Particles->Draw();
         // 绘制球
         Ball->Draw(*Renderer);
-//        Effects->EndRender();
-//        Effects->Render(glfwGetTime());
+        Effects->EndRender();
+        Effects->Render(glfwGetTime());
     }
 }
 

@@ -9,6 +9,27 @@
 PostProcessor::PostProcessor(Shader shader, GLuint width, GLuint height)
         : PostProcessingShader(shader), Texture(), Width(width), Height(height), Confuse(GL_FALSE), Chaos(GL_FALSE),
           Shake(GL_FALSE) {
+//    1. (->MSFBO(MultiSample))->RBO
+//    glGenFramebuffers(1, &this->MSFBO);
+//    glBindFramebuffer(GL_FRAMEBUFFER, this->MSFBO);
+//    glGenRenderbuffers(1, &this->RBO);
+//    glBindRenderbuffer(GL_RENDERBUFFER, this->RBO);
+//    glRenderbufferStorageMultisample(GL_RENDERBUFFER, 8, GL_RGB, width, height);
+//    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, this->RBO);
+//    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+//        std::cout << "ERROR::POSTPROCESSOR: Failed to initialize MSFBO" << std::endl;
+//    }
+//
+//    2. (FBO<-)->Texture
+//    glGenFramebuffers(1, &this->FBO);
+//    glBindFramebuffer(GL_FRAMEBUFFER, this->FBO);
+//    this->Texture.Generate(width, height, NULL);
+//    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->Texture.ID, 0);
+//    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+//        std::cout << "ERROR::POSTPROCESSOR: Failed to initialize FBO" << std::endl;
+//    }
+//    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     // Initialize renderbuffer/framebuffer object
     glGenFramebuffers(1, &this->MSFBO);
     glGenFramebuffers(1, &this->FBO);
@@ -21,7 +42,7 @@ PostProcessor::PostProcessor(Shader shader, GLuint width, GLuint height)
                                      height); // Allocate storage for render buffer object
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER,
                               this->RBO); // Attach MS render buffer object to framebuffer
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         std::cout << "ERROR::POSTPROCESSOR: Failed to initialize MSFBO" << std::endl;
     }
 
@@ -30,14 +51,15 @@ PostProcessor::PostProcessor(Shader shader, GLuint width, GLuint height)
     this->Texture.Generate(width, height, NULL);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->Texture.ID,
                            0); // Attach texture to framebuffer as its color attachment
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         std::cout << "ERROR::POSTPROCESSOR: Failed to initialize FBO" << std::endl;
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Initialize render data and uniforms
     this->initRenderData();
-    this->PostProcessingShader.SetInteger("scene", 0, GL_TRUE);
+    this->PostProcessingShader.Use();
+    this->PostProcessingShader.SetInteger("scene", 0);
     GLfloat offset = 1.0f / 300.0f;
     GLfloat offsets[9][2] = {
             {-offset, offset},  // top-left
@@ -75,7 +97,8 @@ void PostProcessor::EndRender() {
     // Now resolve multisampled color-buffer into intermediate FBO to store to texture
     glBindFramebuffer(GL_READ_FRAMEBUFFER, this->MSFBO);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->FBO);
-    glBlitFramebuffer(0, 0, this->Width, this->Height, 0, 0, this->Width, this->Height, GL_COLOR_BUFFER_BIT,
+    glBlitFramebuffer(0, 0, this->Width, this->Height, 0, 0, this->Width, this->Height,
+                      GL_COLOR_BUFFER_BIT,
                       GL_NEAREST);
     glBindFramebuffer(GL_FRAMEBUFFER, 0); // Binds both READ and WRITE framebuffer to default framebuffer
 }
