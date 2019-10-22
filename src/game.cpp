@@ -11,6 +11,10 @@
 #include "post_processor.h"
 #include "text_renderer.h"
 
+#include "irrKlang.h"
+
+using namespace irrklang;
+
 #include <sstream>
 
 // Game-related State data
@@ -28,6 +32,8 @@ GLfloat ShakeTime = 0.0f;
 
 TextRenderer *Text;
 
+ISoundEngine *SoundEngine = createIrrKlangDevice();
+
 Game::Game(GLuint width, GLuint height)
         : State(GAME_MENU), Keys(), Width(width), Height(height), Lives(3) {
 
@@ -40,6 +46,7 @@ Game::~Game() {
     delete Particles;
     delete Effects;
     delete Text;
+    SoundEngine->drop();
 }
 
 void Game::Init() {
@@ -99,10 +106,8 @@ void Game::Init() {
     glm::vec2 ballPos = playerPos + glm::vec2(PLAYER_SIZE.x / 2 - BALL_RADIUS, -BALL_RADIUS * 2);
     Ball = new BallObject(ballPos, BALL_RADIUS, INITIAL_BALL_VELOCITY,
                           ResourceManager::GetTexture("face"));
-
-//    Effects->Shake = GL_TRUE;
-//    Effects->Confuse = GL_TRUE;
-//    Effects->Chaos = GL_TRUE;
+    // Audio
+    SoundEngine->play2D("../res/audio/breakout.wav", GL_TRUE);
 }
 
 void Game::Update(GLfloat dt) {
@@ -390,9 +395,13 @@ void Game::DoCollisions() {
                 if (!box.IsSolid) {
                     box.Destroyed = GL_TRUE;
                     this->SpawnPowerUps(box);
+
+                    SoundEngine->play2D("../res/audio/bleep1.wav", GL_FALSE);
                 } else {   // if block is solid, enable shake effect
                     ShakeTime = 0.05f;
                     Effects->Shake = GL_TRUE;
+
+                    SoundEngine->play2D("../res/audio/solid.wav", GL_FALSE);
                 }
                 // 碰撞处理
                 Direction dir = std::get<1>(collision);
@@ -441,6 +450,8 @@ void Game::DoCollisions() {
         Ball->Velocity = glm::normalize(Ball->Velocity) * glm::length(oldVelocity);
         // Sticky效果
         Ball->Stuck = Ball->Sticky;
+
+        SoundEngine->play2D("../res/audio/bleep.wav", GL_FALSE);
     }
     for (PowerUp &powerUp : this->PowerUps) {
         if (!powerUp.Destroyed) {
@@ -451,6 +462,8 @@ void Game::DoCollisions() {
                 ActivatePowerUp(powerUp);
                 powerUp.Destroyed = GL_TRUE;
                 powerUp.Activated = GL_TRUE;
+
+                SoundEngine->play2D("../res/audio/powerup.wav", GL_FALSE);
             }
         }
     }
